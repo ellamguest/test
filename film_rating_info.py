@@ -8,10 +8,25 @@ Created on Sun Jul  5 10:23:38 2015
 import pandas as pd
 from imdb import IMDb
 
-ia = IMDb()
+ia = IMDb(loggingLevel='DEBUG')
 
 # list of 10 highest grossing films of all time
-film_names = ['Avatar', 'Titanic', 'The Avengers', 'Furious 7', 'Avengers: Age of Ultron', 'Harry Potter and the Deathly Hallows: Part 2', 'Jurassic World', 'Frozen', 'Iron Man 3', 'Transformers: Dark of the Moon']
+#film_names = ['Avatar', 'Titanic', 'The Avengers', 'Furious 7', 'Avengers: Age of Ultron', 'Harry Potter and the Deathly Hallows: Part 2', 'Jurassic World', 'Frozen', 'Iron Man 3', 'Transformers: Dark of the Moon']
+
+print 'Getting list of films'
+
+def read_ratings(filename, header=27):
+    results = []
+    for i, line in enumerate(open(filename)):
+        if i > header:        
+            result = line.split('  ')[-1].strip()
+            results.append(result)
+
+    return results
+
+film_names = read_ratings('test.list')
+
+print 'Getting film objects'
 
 # list of film objects
 film_objects = []
@@ -21,6 +36,7 @@ for x in film_names:
     ia.update(project)
     film_objects.append(project)
 
+print 'Getting film info'
 # dict of film objects : director, HEAD writer, rating
 film_info = {}
 for x in film_objects:
@@ -65,4 +81,8 @@ rating_series = pd.Series(all_ratings)
 
 #series_dict = {'film' : film_series, 'director' : director_series, 'writer' : writer_series, 'rating' : rating_series}
 
+print 'Making database'
+
 df = pd.DataFrame(columns = ['film', 'director', 'writer', 'rating'], data = zip(film_series, director_series, writer_series, rating_series))
+
+print df
