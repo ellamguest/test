@@ -8,12 +8,10 @@ Created on Sun Jul  5 10:23:38 2015
 import pandas as pd
 from imdb import IMDb
 
-ia = IMDb(loggingLevel='DEBUG')
+ia = IMDb()
 
 # list of 10 highest grossing films of all time
 #film_names = ['Avatar', 'Titanic', 'The Avengers', 'Furious 7', 'Avengers: Age of Ultron', 'Harry Potter and the Deathly Hallows: Part 2', 'Jurassic World', 'Frozen', 'Iron Man 3', 'Transformers: Dark of the Moon']
-
-print 'Getting list of films'
 
 def read_ratings(filename, header=27):
     results = []
@@ -26,7 +24,7 @@ def read_ratings(filename, header=27):
 
 film_names = read_ratings('test.list')
 
-print 'Getting film objects'
+
 
 # list of film objects
 film_objects = []
@@ -36,7 +34,7 @@ for x in film_names:
     ia.update(project)
     film_objects.append(project)
 
-print 'Getting film info'
+
 # dict of film objects : director, HEAD writer, rating
 film_info = {}
 for x in film_objects:
@@ -46,6 +44,7 @@ for x in film_objects:
     rating = x['rating']
     info = (director, head_writer, rating)
     film_info[x] = info
+
 
 # list of all directors obejcts
 all_directors = []
@@ -75,13 +74,13 @@ for x in film_objects:
 
 #make series of names
 film_series = pd.Series(film_names)
+print film_series
 director_series = pd.Series(all_director_names)
 writer_series = pd.Series(all_writer_names)
 rating_series = pd.Series(all_ratings)
 
-#series_dict = {'film' : film_series, 'director' : director_series, 'writer' : writer_series, 'rating' : rating_series}
+series_dict = {'film' : film_series, 'director' : director_series, 'writer' : writer_series, 'rating' : rating_series}
 
-print 'Making database'
 
 df = pd.DataFrame(columns = ['film', 'director', 'writer', 'rating'], data = zip(film_series, director_series, writer_series, rating_series))
 
