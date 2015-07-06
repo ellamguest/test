@@ -7,6 +7,10 @@ Created on Sun Jul  5 12:14:04 2015
 import pdb
 import re
 
+writers_file = 'writers.list'
+directors_file = 'directors.list'
+ratings_file = 'test.list'
+
 def read_films(filename, header=27):
     results = []
     for i, line in enumerate(open(filename)):
@@ -15,9 +19,6 @@ def read_films(filename, header=27):
             results.append(result)
 
     return results
-
-film_names = read_films('test.list')
-
 
 def read_ratings(filename, header=27):
     results = {}
@@ -29,59 +30,25 @@ def read_ratings(filename, header=27):
 
     return results
 
-film_ratings = read_ratings('test.list')
-
-
-def read_writers(filename, header=301):
+def get_writer_lines(filename, header=301):
     results = []
     for i, line in enumerate(open(filename)):
         if i > header:        
-            result = line.split('	')[0].strip()
-            if result != '':
-                results.append(result)
-
+           results.append(line)
     return results
 
-writer_names = read_writers('writers_test.list')
-
-pattern = '.*\((?:\d|\?){4}(?:\/[IVX]+)?\)'
-
-def read_writer_films(filename, header=301):
-    regex = re.compile(pattern)    
-    
+def get_director_lines(filename, header=234):
     results = []
-    n = -1
     for i, line in enumerate(open(filename)):
-#        if i % 100 == 0:
-#            print 'processing line {}'.format(i)
-        if i > header:  
-            line = line.strip() 
-            line = line.split('\t')
-            line = filter(None, line) #is this still needed?
-            if line != []: #better way to skip empty lines?
-            # if the first item doesn't contain a year it's a name            
-                if re.search(pattern, line[0]) == None:
-                    n += 1                
-                    name = line[0]
-                    item = line[1]
-                    item = regex.findall(item)[0]
-                    results.append([item])
-                # year is found, first term not name
-                if re.search(pattern, line[0]) != None:
-                    item = line[0] #why 1 out of range?
-                    item = regex.findall(item)[0]
-                    results[n].append(item)
+        if i > header:        
+            results.append(line)
     return results
 
+film_names = read_films(ratings_file)
+film_ratings = read_ratings(ratings_file)
+writer_lines = get_writer_lines(writers_file)
+director_lines = get_director_lines(directors_file)
 
-
-data = [''''Abd Al-Hamid, Ja'far	Just Outside the Frame: The Profilmic Event and Beyond (2008)  (writer)''', '''
-			Mesocaf\E9 (2011)  (written by)''',
-'           '
- ''''Dada' Pecori, Diego	Adam (????)''', '''
-			Cantarella (2011)  (story)''',
- '''A. Nolan, Simon		Two Worlds (2015/II)  (writer)''',
- '''A, Salman		The Ride (2015/II)  (writer)''']
 
 def format_line(line):    
     line = line.strip()
@@ -99,7 +66,9 @@ def format_lines(lines):
             new_lines.append(new)
     return new_lines
 
-def pull_items2(data):
+pattern = '.*\((?:\d|\?){4}(?:\/[IVXL]+)?\)'
+
+def pull_items(data):
     lines = format_lines(data)
     regex = re.compile(pattern)
     results = {}
@@ -119,74 +88,32 @@ def pull_items2(data):
             results[name] = [item]
     return results
 
+writer_films = pull_items(writer_lines)
+director_films = pull_items(director_lines)
 
-
-#############################################################
-#NO USE MAPPING TO PREVIOUS BC SOME HAVE MULTIPLE ENTRIES
-############################################################
-#####old attempt, not gonna work for multiples
-def pull_items(lines):
-    for line in lines:
-        line = format_line(line)
-        if line == []: #better way to skip empty lines?
-            lines.remove(line)
-    n = -1
-    regex = re.compile(pattern)     
-    results = []
-    while n < len(lines):
-        previous = lines[n]
-        current = lines[n+1]    
-        print n, 'previous', previous
-        print n, 'current', current
-            # if the first item doesn't contain a year it's a name            
-        if re.search(pattern, line[0]) == None:
-            name = line[0]                        
-            item = line[1]
-            item = regex.findall(item)[0]
-            print 'name', name
-            print 'item', item
-            results.append([name, item])
-    #            results[name] = [item]
-    #            print results
-            # year is found, first term not name
-    ## HOW TO MAP ITEM TO NAME FROM PREVIOUS LINE  
-        if re.search(pattern, line[0]) != None:
-            item = line[0] #why 1 out of range?
-            print 'name', name
-            print 'item', item
-    #            print 'item', item
-            item = next(regex.finditer(item)).string
-            return item
-    #            values = results[name]
-    #            values.append(item)
-    #            results[name] = values            
-    #            print results
-        n += 1
+def search_filmographies(film, d):
+    results = []    
+    for x in d:
+        if film in d[x]:
+            results.append(x)
     return results
 
-def writer_filmographies(writer_names, writer_films):
-    if len(writer_names) != len(writer_films):
-        print 'Writer names and films don\'t match!'
+def get_film_info(film):
+    rating = film_ratings[film]
+    director = search_filmographies(film, director_films)
+    writer = search_filmographies(film, writer_films)
+    info = [rating, director, writer]
+    return info
+
+def make_film_dict(film_names):
     d = {}
-    n = 0
-    while n < len(writer_names):
-        d[writer_names[n]] = writer_films[n]
-        n += 1
+    for film in film_names:
+        info = get_film_info(film)
+        d[film] = info
     return d
+    
+d = make_film_dict(film_names)
 
-def get_director_lines(filename, header=234):
-    results = []
-    for i, line in enumerate(open(filename)):
-        if i > header:        
-            results.append(line)
-
-    return results
-
-director_lines = get_director_lines('directors_test.list')
-
-director_films = pull_items2(director_lines)
-
-for x in director_films:
-    print 'name', x
-    print 'films', director_films[x] 
+print d
+        
 
