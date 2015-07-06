@@ -6,6 +6,7 @@ Created on Sun Jul  5 12:14:04 2015
 """
 import pdb
 import re
+import cPickle
 
 writers_file = 'writers.list'
 directors_file = 'directors.list'
@@ -30,17 +31,17 @@ def read_ratings(filename, header=27):
 
     return results
 
-def get_writer_lines(filename, header=301):
+def get_writer_lines(filename, header=301, footer=3582903):
     results = []
     for i, line in enumerate(open(filename)):
-        if i > header:        
+        if header < i <= footer:        
            results.append(line)
     return results
 
-def get_director_lines(filename, header=234):
+def get_director_lines(filename, header=234, footer=2244913):
     results = []
     for i, line in enumerate(open(filename)):
-        if i > header:        
+        if header < i <= footer:        
             results.append(line)
     return results
 
@@ -74,6 +75,7 @@ def pull_items(data):
     results = {}
     n = 0
     while n < len(lines):
+        print n
         line = lines[n]
         if re.search(pattern, line[0]) == None:
             name = line[0]
@@ -88,8 +90,19 @@ def pull_items(data):
             results[name] = [item]
     return results
 
-writer_films = pull_items(writer_lines)
-director_films = pull_items(director_lines)
+def save_writer_films():
+    writer_films = pull_items(writer_lines)
+    cPickle.dump(writer_films, open('writer_films.pickle', 'w+'))
+    
+def load_writer_films():    
+    return cPickle.load(open('writer_films.pickle', 'r'))
+
+def save_director_films():
+    director_films = pull_items(director_lines)
+    cPickle.dump(director_films, open('director_films.pickle', 'w+'))
+    
+def load_director_films():    
+    return cPickle.load(open('director_films.pickle', 'r'))
 
 def search_filmographies(film, d):
     results = []    
@@ -97,6 +110,9 @@ def search_filmographies(film, d):
         if film in d[x]:
             results.append(x)
     return results
+
+writer_films = load_writer_films() if 'writer_films' not in dir() else writer_films
+director_films = load_director_films() if 'director_films' not in dir() else director_films
 
 def get_film_info(film):
     rating = film_ratings[film]
@@ -111,9 +127,12 @@ def make_film_dict(film_names):
         info = get_film_info(film)
         d[film] = info
     return d
-    
+
 d = make_film_dict(film_names)
 
-print d
+for x in d:
+    print x
+    print d[x]
+    print ''
         
 
