@@ -75,23 +75,56 @@ def read_writer_films(filename, header=301):
 
 
 
-lines = [''''Abd Al-Hamid, Ja'far	Just Outside the Frame: The Profilmic Event and Beyond (2008)  (writer)''', '''
+data = [''''Abd Al-Hamid, Ja'far	Just Outside the Frame: The Profilmic Event and Beyond (2008)  (writer)''', '''
 			Mesocaf\E9 (2011)  (written by)''',
+'           '
  ''''Dada' Pecori, Diego	Adam (????)''', '''
 			Cantarella (2011)  (story)''',
  '''A. Nolan, Simon		Two Worlds (2015/II)  (writer)''',
  '''A, Salman		The Ride (2015/II)  (writer)''']
 
 def format_line(line):    
-    line = line.strip() 
+    line = line.strip()
     line = line.split('\t')
     line = filter(None, line) #is this still needed?
     return line
 
+def format_lines(lines):
+    new_lines = []    
+    for line in lines:
+        new = format_line(line)
+        if new == []: #better way to skip empty lines?
+            pass
+        else:
+            new_lines.append(new)
+    return new_lines
+
+def pull_items2(data):
+    lines = format_lines(data)
+    regex = re.compile(pattern)
+    results = {}
+    n = 0
+    while n < len(lines):
+        line = lines[n]
+        if re.search(pattern, line[0]) == None:
+            name = line[0]
+            item = line[1]
+        else:
+            item = line[0]
+        item = regex.findall(item)[0]
+        n += 1
+        if name in results:
+            results[name].append(item)
+        else:
+            results[name] = [item]
+    return results
+
+
+
 #############################################################
 #NO USE MAPPING TO PREVIOUS BC SOME HAVE MULTIPLE ENTRIES
 ############################################################
-
+#####old attempt, not gonna work for multiples
 def pull_items(lines):
     for line in lines:
         line = format_line(line)
@@ -131,18 +164,6 @@ def pull_items(lines):
         n += 1
     return results
 
-def map_items(items):
-    return
-    
-
-print pull_items(lines)
-
-
-
-  
-
-
-
 def writer_filmographies(writer_names, writer_films):
     if len(writer_names) != len(writer_films):
         print 'Writer names and films don\'t match!'
@@ -152,23 +173,20 @@ def writer_filmographies(writer_names, writer_films):
         d[writer_names[n]] = writer_films[n]
         n += 1
     return d
-        
 
-
-      
-
-    
-
-def read_directors(filename, header=233):
+def get_director_lines(filename, header=234):
     results = []
     for i, line in enumerate(open(filename)):
         if i > header:        
-            result = line.split('	')[0].strip()
-            if result != '':
-                results.append(result)
+            results.append(line)
 
     return results
 
-#director_names = read_directors('directors.list')
+director_lines = get_director_lines('directors_test.list')
 
+director_films = pull_items2(director_lines)
+
+for x in director_films:
+    print 'name', x
+    print 'films', director_films[x] 
 
