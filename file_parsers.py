@@ -10,23 +10,31 @@ import cPickle
 
 writers_file = 'writers.list'
 directors_file = 'directors.list'
-ratings_file = 'test.list'
+ratings_file = 'ratings.list'
 
-def read_films(filename, header=27):
+pattern = '.*\((?:\d|\?){4}(?:\/[IVXL]+)?\)' #year marker to differentiate names from films
+
+###################################################################################
+#BREAK FILES INTO LINES
+###################################################################################
+
+def read_films(filename, header=281407, footer=633534):
     results = []
     for i, line in enumerate(open(filename)):
-        if i > header:        
+        if header < i <= footer:          
             result = line.split('  ')[-1].strip()
             results.append(result)
+            print i, 'film', result
 
     return results
 
-def read_ratings(filename, header=27):
+def read_ratings(filename, header=281407, footer=633534):
     results = {}
     for i, line in enumerate(open(filename)):
-        if i > header:        
+        if header < i <= footer:       
             name = line.split('  ')[-1].strip()
             rating = line.split('  ')[-2].strip()
+            print i, 'rating', rating, name
             results[name] = [rating]
 
     return results
@@ -35,22 +43,30 @@ def get_writer_lines(filename, header=301, footer=3582903):
     results = []
     for i, line in enumerate(open(filename)):
         if header < i <= footer:        
-           results.append(line)
+            print i, 'writer', line
+            results.append(line)
     return results
 
 def get_director_lines(filename, header=234, footer=2244913):
     results = []
     for i, line in enumerate(open(filename)):
-        if header < i <= footer:        
+        if header < i <= footer:
+            print i, 'director', line
             results.append(line)
     return results
 
-film_names = read_films(ratings_file)
-film_ratings = read_ratings(ratings_file)
-writer_lines = get_writer_lines(writers_file)
+###################################################################################
+#CREATE LINES VARAIBLES
+###################################################################################
+
+#film_names = read_films(ratings_file)
+#film_ratings = read_ratings(ratings_file)
+#writer_lines = get_writer_lines(writers_file)
 director_lines = get_director_lines(directors_file)
 
-
+###################################################################################
+#BREAK LINES INTO ITEMS
+###################################################################################
 def format_line(line):    
     line = line.strip()
     line = line.split('\t')
@@ -66,8 +82,6 @@ def format_lines(lines):
         else:
             new_lines.append(new)
     return new_lines
-
-pattern = '.*\((?:\d|\?){4}(?:\/[IVXL]+)?\)'
 
 def pull_items(data):
     lines = format_lines(data)
@@ -89,6 +103,26 @@ def pull_items(data):
         else:
             results[name] = [item]
     return results
+ 
+
+###################################################################################
+#DUMP INFO
+###################################################################################
+def save_film_names():
+    cPickle.dump(film_names, open('film_list.pickle', 'w+'))
+    
+def load_film_list():    
+    return cPickle.load(open('film_list.pickle', 'r'))
+
+#film_list = load_film_list() if 'film_list' not in dir() else film_list ------------ test these 1 at a time
+
+def save_film_ratings():
+    cPickle.dump(film_ratings, open('film_ratings_list.pickle', 'w+'))
+
+def load_ratings_list():    
+    return cPickle.load(open('film_ratings_list.pickle', 'r'))
+
+#ratings_list = load_ratings_list() if 'ratings_list' not in dir() else ratings_list
 
 def save_writer_films():
     writer_films = pull_items(writer_lines)
@@ -97,6 +131,8 @@ def save_writer_films():
 def load_writer_films():    
     return cPickle.load(open('writer_films.pickle', 'r'))
 
+#writer_films = load_writer_films() if 'writer_films' not in dir() else writer_films
+
 def save_director_films():
     director_films = pull_items(director_lines)
     cPickle.dump(director_films, open('director_films.pickle', 'w+'))
@@ -104,15 +140,18 @@ def save_director_films():
 def load_director_films():    
     return cPickle.load(open('director_films.pickle', 'r'))
 
+#director_films = load_director_films() if 'director_films' not in dir() else director_films
+
+###################################################################################
+#COLLATE INFO INTO DICT
+###################################################################################
+
 def search_filmographies(film, d):
     results = []    
     for x in d:
         if film in d[x]:
             results.append(x)
     return results
-
-writer_films = load_writer_films() if 'writer_films' not in dir() else writer_films
-director_films = load_director_films() if 'director_films' not in dir() else director_films
 
 def get_film_info(film):
     rating = film_ratings[film]
@@ -128,11 +167,22 @@ def make_film_dict(film_names):
         d[film] = info
     return d
 
-d = make_film_dict(film_names)
+#d = make_film_dict(film_names) ----------- test last
+#
+#for x in d:
+#    print x
+#    print d[x]
+#    print ''
 
-for x in d:
-    print x
-    print d[x]
-    print ''
+###################################################################################
+#DUMP FILMOGRAPHY DICT
+###################################################################################
         
+def save_film_dict():
+    film_dict = make_film_dict(film_names)
+    cPickle.dump(film_dict, open('film_dict.pickle', 'w+'))
+    
+def load_film_dict():    
+    return cPickle.load(open('film_dict.pickle', 'r'))
 
+#film_dict = load_film_dict if 'film_dict' not in dir() else film_dict
