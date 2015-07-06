@@ -39,6 +39,24 @@ def read_ratings(filename, header=281407, footer=633534):
 
     return results
 
+#testing make_film_dict with top 250 bc short
+#def read_films(filename):
+#    results = []
+#    for i, line in enumerate(open(filename)):
+#        result = line.split('  ')[-1].strip()
+#        results.append(result)
+#        print 'film', result
+#    return results
+#
+#def read_ratings(filename):
+#    results = {}
+#    for i, line in enumerate(open(filename)):
+#        name = line.split('  ')[-1].strip()
+#        rating = line.split('  ')[-2].strip()
+#        results[name] = rating
+#        print 'rating', rating, name
+#    return results
+
 def get_writer_lines(filename, header=301, footer=3582903):
     results = []
     for i, line in enumerate(open(filename)):
@@ -54,15 +72,6 @@ def get_director_lines(filename, header=234, footer=2244913):
             print i, 'director', line
             results.append(line)
     return results
-
-###################################################################################
-#CREATE LINES VARAIBLES
-###################################################################################
-
-#film_names = read_films(ratings_file)
-#film_ratings = read_ratings(ratings_file)
-#writer_lines = get_writer_lines(writers_file)
-director_lines = get_director_lines(directors_file)
 
 ###################################################################################
 #BREAK LINES INTO ITEMS
@@ -89,8 +98,8 @@ def pull_items(data):
     results = {}
     n = 0
     while n < len(lines):
-        print n
         line = lines[n]
+        print n, line
         if re.search(pattern, line[0]) == None:
             name = line[0]
             item = line[1]
@@ -104,43 +113,59 @@ def pull_items(data):
             results[name] = [item]
     return results
  
+###################################################################################
+#PULL, FORMAT, AND DUMP INFO
+###################################################################################
 
-###################################################################################
-#DUMP INFO
-###################################################################################
-def save_film_names():
+def save_film_names():    
+    film_names = read_films(ratings_file)
     cPickle.dump(film_names, open('film_list.pickle', 'w+'))
     
 def load_film_list():    
     return cPickle.load(open('film_list.pickle', 'r'))
 
-#film_list = load_film_list() if 'film_list' not in dir() else film_list ------------ test these 1 at a time
+save_film_names()
+film_list = load_film_list() if 'film_list' not in dir() else film_list
 
 def save_film_ratings():
+    film_ratings = read_ratings(ratings_file)
+    print 'Dumping now'
     cPickle.dump(film_ratings, open('film_ratings_list.pickle', 'w+'))
 
 def load_ratings_list():    
     return cPickle.load(open('film_ratings_list.pickle', 'r'))
 
-#ratings_list = load_ratings_list() if 'ratings_list' not in dir() else ratings_list
+save_film_ratings()
+ratings_list = load_ratings_list() if 'ratings_list' not in dir() else ratings_list
 
 def save_writer_films():
+    writer_lines = get_writer_lines(writers_file)
     writer_films = pull_items(writer_lines)
     cPickle.dump(writer_films, open('writer_films.pickle', 'w+'))
     
 def load_writer_films():    
     return cPickle.load(open('writer_films.pickle', 'r'))
 
-#writer_films = load_writer_films() if 'writer_films' not in dir() else writer_films
+writer_films = load_writer_films() if 'writer_films' not in dir() else writer_films
 
 def save_director_films():
+    director_lines = get_director_lines(directors_file)
     director_films = pull_items(director_lines)
     cPickle.dump(director_films, open('director_films.pickle', 'w+'))
     
 def load_director_films():    
     return cPickle.load(open('director_films.pickle', 'r'))
 
-#director_films = load_director_films() if 'director_films' not in dir() else director_films
+director_films = load_director_films() if 'director_films' not in dir() else director_films
+
+
+
+"""first time running need to:
+save_film_names()
+save_film_ratings()
+save_writer_films()
+save_director_films()
+"""
 
 ###################################################################################
 #COLLATE INFO INTO DICT
@@ -154,18 +179,33 @@ def search_filmographies(film, d):
     return results
 
 def get_film_info(film):
-    rating = film_ratings[film]
+    rating = ratings_list[film]
     director = search_filmographies(film, director_films)
     writer = search_filmographies(film, writer_films)
     info = [rating, director, writer]
     return info
 
-def make_film_dict(film_names):
+def make_film_dict(film_list):
     d = {}
-    for film in film_names:
+    for film in film_list:
         info = get_film_info(film)
-        d[film] = info
+        if info[1] != [] and info[2] != []:
+            print film, info
+            d[film] = info
     return d
+
+
+
+def save_film_dict():
+    film_dict = make_film_dict(film_list)
+    cPickle.dump(film_dict, open('film_dict.pickle', 'w+'))
+    
+def load_film_dict():    
+    return cPickle.load(open('film_dict.pickle', 'r'))
+
+
+#save_film_dict()
+film_dict = load_film_dict if 'film_dict' not in dir() else film_dict
 
 #d = make_film_dict(film_names) ----------- test last
 #
@@ -175,14 +215,10 @@ def make_film_dict(film_names):
 #    print ''
 
 ###################################################################################
-#DUMP FILMOGRAPHY DICT
+#TEST WITH TOP 250
 ###################################################################################
-        
-def save_film_dict():
-    film_dict = make_film_dict(film_names)
-    cPickle.dump(film_dict, open('film_dict.pickle', 'w+'))
-    
-def load_film_dict():    
-    return cPickle.load(open('film_dict.pickle', 'r'))
 
-#film_dict = load_film_dict if 'film_dict' not in dir() else film_dict
+top_250_films = [line.split('  ')[-1].strip() for line in open('top_250.txt')]
+
+
+
