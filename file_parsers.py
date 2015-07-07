@@ -39,24 +39,6 @@ def read_ratings(filename, header=281407, footer=633534):
 
     return results
 
-#testing make_film_dict with top 250 bc short
-#def read_films(filename):
-#    results = []
-#    for i, line in enumerate(open(filename)):
-#        result = line.split('  ')[-1].strip()
-#        results.append(result)
-#        print 'film', result
-#    return results
-#
-#def read_ratings(filename):
-#    results = {}
-#    for i, line in enumerate(open(filename)):
-#        name = line.split('  ')[-1].strip()
-#        rating = line.split('  ')[-2].strip()
-#        results[name] = rating
-#        print 'rating', rating, name
-#    return results
-
 def get_writer_lines(filename, header=301, footer=3582903):
     results = []
     for i, line in enumerate(open(filename)):
@@ -65,7 +47,9 @@ def get_writer_lines(filename, header=301, footer=3582903):
             results.append(line)
     return results
 
-def get_director_lines(filename, header=234, footer=2244913):
+#previous footer=2244913
+
+def get_director_lines(filename, header=234, footer=2639293):
     results = []
     for i, line in enumerate(open(filename)):
         if header < i <= footer:
@@ -124,8 +108,8 @@ def save_film_names():
 def load_film_list():    
     return cPickle.load(open('film_list.pickle', 'r'))
 
-save_film_names()
-film_list = load_film_list() if 'film_list' not in dir() else film_list
+#save_film_names()
+#film_list = load_film_list() if 'film_list' not in dir() else film_list
 
 def save_film_ratings():
     film_ratings = read_ratings(ratings_file)
@@ -135,8 +119,8 @@ def save_film_ratings():
 def load_ratings_list():    
     return cPickle.load(open('film_ratings_list.pickle', 'r'))
 
-save_film_ratings()
-ratings_list = load_ratings_list() if 'ratings_list' not in dir() else ratings_list
+#save_film_ratings()
+#ratings_list = load_ratings_list() if 'ratings_list' not in dir() else ratings_list
 
 def save_writer_films():
     writer_lines = get_writer_lines(writers_file)
@@ -145,6 +129,8 @@ def save_writer_films():
     
 def load_writer_films():    
     return cPickle.load(open('writer_films.pickle', 'r'))
+
+#pdb.set_trace()
 
 writer_films = load_writer_films() if 'writer_films' not in dir() else writer_films
 
@@ -156,9 +142,9 @@ def save_director_films():
 def load_director_films():    
     return cPickle.load(open('director_films.pickle', 'r'))
 
+#pdb.set_trace()
+
 director_films = load_director_films() if 'director_films' not in dir() else director_films
-
-
 
 """first time running need to:
 save_film_names()
@@ -185,6 +171,22 @@ def get_film_info(film):
     info = [rating, director, writer]
     return info
 
+def print_film_info(film):
+    info = get_film_info(film)
+    print 'Film: {}'.format(film)
+    print 'Rating: {}'.format(info[0])
+    print 'Director(s): {}'.format(info[0])
+    print 'Writers(s): {}'.format(info[0])
+
+def get_director_ratings(director):
+    ratings = []    
+    films = director_films[director] #is this the right format?
+    for film in films:
+        rating = ratings_list[film]
+        info = [film, rating]
+        ratings.append(info)
+    return ratings
+
 def make_film_dict(film_list):
     d = {}
     for film in film_list:
@@ -194,7 +196,7 @@ def make_film_dict(film_list):
             d[film] = info
     return d
 
-
+# MAKE SURE THAT FILM DICT IS BEST FORMAT THEN COMMIT
 
 def save_film_dict():
     film_dict = make_film_dict(film_list)
@@ -205,7 +207,7 @@ def load_film_dict():
 
 
 #save_film_dict()
-film_dict = load_film_dict if 'film_dict' not in dir() else film_dict
+#film_dict = load_film_dict if 'film_dict' not in dir() else film_dict
 
 #d = make_film_dict(film_names) ----------- test last
 #
@@ -214,11 +216,48 @@ film_dict = load_film_dict if 'film_dict' not in dir() else film_dict
 #    print d[x]
 #    print ''
 
+#####################
+
+
+
 ###################################################################################
 #TEST WITH TOP 250
 ###################################################################################
 
+#pdb.set_trace()
+
 top_250_films = [line.split('  ')[-1].strip() for line in open('top_250.txt')]
 
+#pdb.set_trace()
 
+top_250_ratings = [line.split('  ')[-2].strip() for line in open('top_250.txt')]
+    
+def get_top_director_ratings(director):
+    ratings = []    
+    films = director_films[director] #is this the right format?
+    for film in films:
+        if film in top_250_films:
+            rating = top_250_ratings[top_250_films.index(film)]
+            info = [film, rating]
+            ratings.append(info)
+    return ratings
+
+def print_top_director_ratings(director):
+    ratings = get_top_director_ratings(director)
+    s = 0
+    print director
+    print '-----------------------'
+    for x in ratings:
+        print '{}: {}'.format(x[1], x[0])
+        s += float(x[1])
+    avg = s / len(ratings)
+    print '-----------------------'
+    print avg, ': Average Rating'
+
+print_top_director_ratings('Spielberg, Steven')
+
+    
+    
+def get_250_writers():
+    pass
 
