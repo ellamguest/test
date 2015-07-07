@@ -38,12 +38,13 @@ def read_ratings(filename, header=281407, footer=633534):
             results[name] = [rating]
 
     return results
-
-def get_writer_lines(filename, header=301, footer=3582903):
+    
+#previous footer=3582903
+def get_writer_lines(filename, header=301, footer=4101660):
     results = []
     for i, line in enumerate(open(filename)):
         if header < i <= footer:        
-            print i, 'writer', line
+#            print i, 'writer', line
             results.append(line)
     return results
 
@@ -83,7 +84,7 @@ def pull_items(data):
     n = 0
     while n < len(lines):
         line = lines[n]
-        print n, line
+#        print n, line
         if re.search(pattern, line[0]) == None:
             name = line[0]
             item = line[1]
@@ -232,6 +233,11 @@ top_250_films = [line.split('  ')[-1].strip() for line in open('top_250.txt')]
 
 top_250_ratings = [line.split('  ')[-2].strip() for line in open('top_250.txt')]
     
+
+def get_top_directors():
+    for film in films:
+    ...
+
 def get_top_director_ratings(director):
     ratings = []    
     films = director_films[director] #is this the right format?
@@ -254,7 +260,29 @@ def print_top_director_ratings(director):
     print '-----------------------'
     print avg, ': Average Rating'
 
-print_top_director_ratings('Spielberg, Steven')
+def get_top_writer_ratings(writer):
+    ratings = []    
+    films = writer_films[writer] #is this the right format?
+    for film in films:
+        if film in top_250_films:
+            rating = top_250_ratings[top_250_films.index(film)]
+            info = [film, rating]
+            ratings.append(info)
+    return ratings
+
+def print_top_writer_ratings(writer):
+    ratings = get_top_writer_ratings(writer)
+    s = 0
+    print writer
+    print '-----------------------'
+    for x in ratings:
+        print '{}: {}'.format(x[1], x[0])
+        s += float(x[1])
+    avg = s / len(ratings)
+    print '-----------------------'
+    print avg, ': Average Rating'
+
+#print_top_director_ratings('Spielberg, Steven')
 
     
     
