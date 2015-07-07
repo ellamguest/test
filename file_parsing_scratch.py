@@ -65,3 +65,34 @@ def load_director_films():
     return cPickle.load(open('director_films.pickle', 'r'))
 
 #director_films = load_director_films() if 'director_films' not in dir() else director_films
+
+
+################################################################################
+## IF I WANT A FULL COPY OF FILM : INFO?!?!
+################################################################################
+#def make_film_dict(film_list):
+#    d = {}
+#    for film in film_list:
+#        info = get_film_info(film)
+#        if info[1] != [] and info[2] != []:
+#            print film, info
+#            d[film] = info
+#    return d
+
+#def save_film_dict():
+#    film_dict = make_film_dict(film_list)
+#    cPickle.dump(film_dict, open('film_dict.pickle', 'w+'))
+#    
+#def load_film_dict():    
+#    return cPickle.load(open('film_dict.pickle', 'r'))
+
+
+#save_film_dict()
+#film_dict = load_film_dict if 'film_dict' not in dir() else film_dict
+
+#d = make_film_dict(film_names) ----------- test last
+#
+#for x in d:
+#    print x
+#    print d[x]
+#    print ''
