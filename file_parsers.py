@@ -2,7 +2,7 @@
 """
 Created on Sun Jul  5 12:14:04 2015
 
-@author: andy
+@author: emg
 """
 import pdb
 import re
@@ -188,23 +188,24 @@ def get_director_ratings(director):
         ratings.append(info)
     return ratings
 
-def make_film_dict(film_list):
-    d = {}
-    for film in film_list:
-        info = get_film_info(film)
-        if info[1] != [] and info[2] != []:
-            print film, info
-            d[film] = info
-    return d
+################################################################################
+## IF I WANT A FULL COPY OF FILM : INFO?!?!
+################################################################################
+#def make_film_dict(film_list):
+#    d = {}
+#    for film in film_list:
+#        info = get_film_info(film)
+#        if info[1] != [] and info[2] != []:
+#            print film, info
+#            d[film] = info
+#    return d
 
-# MAKE SURE THAT FILM DICT IS BEST FORMAT THEN COMMIT
-
-def save_film_dict():
-    film_dict = make_film_dict(film_list)
-    cPickle.dump(film_dict, open('film_dict.pickle', 'w+'))
-    
-def load_film_dict():    
-    return cPickle.load(open('film_dict.pickle', 'r'))
+#def save_film_dict():
+#    film_dict = make_film_dict(film_list)
+#    cPickle.dump(film_dict, open('film_dict.pickle', 'w+'))
+#    
+#def load_film_dict():    
+#    return cPickle.load(open('film_dict.pickle', 'r'))
 
 
 #save_film_dict()
@@ -217,8 +218,22 @@ def load_film_dict():
 #    print d[x]
 #    print ''
 
-#####################
+###############################################################################
+#MAKE REVERSE DICTS
+###############################################################################
+def make_reverse_dict(d):
+    results = {}
+    for k, vs in d.iteritems():
+        for v in vs:
+            if v in results:
+                results[v].append(k)
+            else:
+                results[v] = [k]
+    return results
 
+film_directors = make_reverse_dict(director_films)
+
+film_writers = make_reverse_dict(writer_films)
 
 
 ###################################################################################
@@ -284,8 +299,41 @@ def print_top_writer_ratings(writer):
 
 #print_top_director_ratings('Spielberg, Steven')
 
-    
+def get_top_250_directors()
+    results = []
+    for film in top_250_films:
+        if film in film_directors: #avoiding unicode issues atm
+            director = film_directors[film]
+            results.append(director)
+    results.sort() #make case-insensitive
+    return results
+
+def rank_top_250_directors():
+    d = {}
+    names = get_top_250_directors()
+    for name in names:
+        if str(name) in d:
+            d[str(name)] += 1
+        else:
+            d[str(name)] = 1
+    result = make_reverse_dict(d)
+    return d
     
 def get_250_writers():
     pass
 
+counts_by_director = make_reverse_dict({k: [v] for k, v in ranked_directors.iteritems()})
+
+best_directors = list(itertools.chain(*[(i, counts_by_director[i]) for i in range(8, 0, -1)])) #andy's code
+
+#def list_best_directors(): ella's version of best_directors
+#    c = []
+#    for k in counts_by_director:
+#        info = [k]
+#        for x in counts_by_director[k]:
+#            info.append(x)
+#        c.append(info)
+#    c.sort(reverse=True)
+#    for x in c:
+#        for v in x:
+#            print v
