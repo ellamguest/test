@@ -11,6 +11,7 @@ Created on Tue Jul  7 14:12:49 2015
 import itertools
 from film_data_dump import director_films, writer_films
 from film_data_dicts import make_reverse_dict, film_directors, film_writers
+from pull_item_info import get_film_info, get_ratings, print_ratings
 
 
 top_250_films = [line.split('  ')[-1].strip() for line in open('top_250.txt')]
@@ -36,6 +37,16 @@ def get_top_250_writers():
     results.sort() #make case-insensitive
     return results
 
+def get_top_250_film_info():
+    result = []    
+    for film in top_250_films:
+        print film
+        info = get_film_info(film)
+        print info
+        result.append(info)
+    return result
+    
+top_250_info = get_top_250_film_info()
 
 def rank_top_250_directors():
     '''make dict of (# of top 250 films) : director'''
@@ -52,10 +63,10 @@ def rank_top_250_directors():
 def get_top_director_ratings(director):
     '''get ratings of all director's films in top 250'''
     ratings = []    
-    films = director_films[director] #is this the right format?
+    films = director_films[director]
     for film in films:
         if film in top_250_films:
-            rating = top_250_ratings[top_250_films.index(film)]
+            rating = top_250_ratings[film]
             info = [film, rating]
             ratings.append(info)
     return ratings
@@ -107,7 +118,7 @@ counts_by_director = make_reverse_dict({k: [v] for k, v in ranked_directors.iter
 #andy's version of best_directors
 best_directors = list(itertools.chain(*[(i, counts_by_director[i]) for i in range(8, 0, -1)]))
 
-print best_directors
+
 
 #ella's version of best_directors
 #def list_best_directors():

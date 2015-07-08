@@ -45,4 +45,6 @@ def pull_items(data):
             results[name].append(item)
         else:
             results[name] = [item]
+        if n%10000 == 0:
+            print n, line
     return results

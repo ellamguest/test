@@ -13,17 +13,16 @@ from line_processing import pull_items
 
 
 def save_film_names():    
-    film_names = read_films(ratings_file)
-    cPickle.dump(film_names, open('film_list.pickle', 'w+'))
+    film_list = read_films(ratings_file)
+    cPickle.dump(film_list, open('film_list.pickle', 'w+'))
     
 def load_film_list():    
     return cPickle.load(open('film_list.pickle', 'r'))
 
 
 def save_film_ratings():
-    film_ratings = read_ratings(ratings_file)
-    print 'Dumping now'
-    cPickle.dump(film_ratings, open('film_ratings_list.pickle', 'w+'))
+    ratings_list = read_ratings(ratings_file)
+    cPickle.dump(ratings_list, open('film_ratings_list.pickle', 'w+'))
     
 def load_ratings_list():    
     return cPickle.load(open('film_ratings_list.pickle', 'r'))
@@ -48,11 +47,13 @@ def load_director_films():
 
 
 """first time running need to:
+
+"""
+
 save_film_names()
 save_film_ratings()
 save_writer_films()
 save_director_films()
-"""
 
 '''create list variables from file'''
 film_list = load_film_list() if 'film_list' not in dir() else film_list
