@@ -21,21 +21,25 @@ def get_top_250_directors():
     '''make list of directors of top 250 films'''
     results = []
     for film in top_250_films:
-        if film in film_directors: #avoiding unicode issues atm
+        if film in film_directors: #avoiding unicode issues  atm
             director = film_directors[film]
             results.append(director)
     results.sort() #make case-insensitive
     return results
+    
+top_250_directors = get_top_250_directors()
 
 def get_top_250_writers():
     '''make list of writers of top 250 films'''
     results = []
     for film in top_250_films:
-        if film in film_writers: #avoiding unicode issues atm
+        if film in film_writers: #avoiding unicode issues  atm
             writer = film_writers[film]
             results.append(writer)
     results.sort() #make case-insensitive
     return results
+
+top_250_writers = get_top_250_writers()
 
 def get_top_250_film_info():
     result = []    
@@ -48,7 +52,7 @@ def get_top_250_film_info():
     
 top_250_info = get_top_250_film_info()
 
-def rank_top_250_directors():
+def rank_top_directors():
     '''make dict of (# of top 250 films) : director'''
     d = {}
     names = get_top_250_directors()
@@ -57,6 +61,9 @@ def rank_top_250_directors():
             d[str(name)] += 1
         else:
             d[str(name)] = 1
+    for name in d: # find better may to make ints str
+        num = d[name]
+        d[name] = str(num)
     result = make_reverse_dict(d)
     return result
 
