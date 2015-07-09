@@ -27,6 +27,7 @@ def format_lines(lines):
 pattern = '.*\((?:\d|\?){4}(?:\/[IVXL]+)?\)'
 
 def pull_items(data):
+    print 'Formatting lines...'
     lines = format_lines(data)
     regex = re.compile(pattern)
     results = {}
@@ -45,6 +46,6 @@ def pull_items(data):
             results[name].append(item)
         else:
             results[name] = [item]
-        if n%10000 == 0:
+        if n%100000 == 0:
             print n, line
     return results

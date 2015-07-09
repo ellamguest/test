@@ -6,7 +6,8 @@ Created on Tue Jul  7 15:35:47 2015
 """
 
 import scipy as sp
-from film_data_dicts import ratings_list, film_directors, film_writers
+from film_data_dicts import ratings_list, director_films, writer_films,\
+ film_directors, film_writers
 
 #make hash table of indexes? set()?
 
@@ -62,11 +63,10 @@ def get_writer_avg_rating(name):
     avg = avg_rating(n, writer_films)
     return n, avg
 
-
-get_avg_d_rating('whedon, joss')
-Out[221]: ('Whedon, Joss', 7.8250000000000002)
-
-get_avg_d_rating('whedon, joss')
+def get_all_avg_ratings(name):
+    d_avg = get_director_avg_rating(name)
+    w_avg = get_writer_avg_rating(name)
+    return d_avg, w_avg
 
 def avg_rating_dict(filmography_dict):
     ''''makes a dict of writer/director : avg rating'''
