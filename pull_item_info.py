@@ -27,7 +27,7 @@ def print_film_info(film):
     print 'Writers(s): {}'.format(info[2])
 
 def check_in_dict(name, d):
-    return [n for n in d if name in n.lower()]
+    return [n for n in d if name in n]
 
 def get_ratings(name, filmography_dict):
     '''get the ratings for every film by the writer of director
@@ -55,13 +55,13 @@ def get_director_avg_rating(name):
     d_name = check_in_dict(name, director_films)
     n = d_name[0]
     avg = avg_rating(n, director_films)
-    return n, avg
+    return avg
 
 def get_writer_avg_rating(name):
     w_name = check_in_dict(name, writer_films)
     n = w_name[0]
     avg = avg_rating(n, writer_films)
-    return n, avg
+    return avg
 
 def get_all_avg_ratings(name):
     d_avg = get_director_avg_rating(name)
@@ -71,9 +71,13 @@ def get_all_avg_ratings(name):
 def avg_rating_dict(filmography_dict):
     ''''makes a dict of writer/director : avg rating'''
     d = {}
+    n = 0
     for name in filmography_dict:
-        ratings = get_ratings(name)
+        ratings = get_ratings(name, filmography_dict)
         d[name] = ratings[-1][1]
+        n += 1
+        if n%10000 == 0:
+            print n, name
     return d
 
 def print_ratings(name, filmography_dict):
