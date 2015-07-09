@@ -33,6 +33,7 @@ def make_reverse_dict(d):
         for v in vs:
             if v in results:
                 results[v].append(k)
+                results[v] = list(set(results[v]))
             else:
                 results[v] = [k]
     return results

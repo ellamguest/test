@@ -43,7 +43,8 @@ def pull_items(data):
         item = regex.findall(item)[0]
         n += 1
         if name in results:
-            results[name].append(item)
+            if item not in results[name]: #preventing duplicates
+                results[name].append(item)
         else:
             results[name] = [item]
         if n%100000 == 0:
