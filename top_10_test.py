@@ -6,18 +6,13 @@ Created on Thu Jul  9 09:46:32 2015
 """
 
 import scipy as sp
-import line_processing
-from film_data_dicts import ratings_list, film_directors, film_writers
+from line_processing import *
+from film_data_dicts import ratings_list, film_directors, film_writers,\
+ films_info_dict, director_films, writer_films
 from pull_item_info import get_film_info, get_director_avg_rating, get_writer_avg_rating
 from top_250_test import top_250_films
 
 top_10_films = top_250_films[0:10]
-
-def films_info_dict(films):
-    d = {}
-    for film in films:
-        d[film] = get_film_info(film)
-    return d
 
 top_10_films_info = films_info_dict(top_10_films)
 
