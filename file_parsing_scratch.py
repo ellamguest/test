@@ -1,98 +1,87 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jul  5 17:55:11 2015
+Created on Sun Jul  5 10:23:38 2015
 
 @author: emg
 """
-import pdb
-import re
-import cPickle
-import file_parsers.py as fp
 
-ratings_file = 'ratings.list'
-writers_file = 'writers.list'
-directors_file = 'directors.list'
+import pandas as pd
+from imdb import IMDb
 
+ia = IMDb()
 
-###################################################################################
-#CREATE LINES VARAIBLES + DUMP INFO
-###################################################################################
+# list of 10 highest grossing films of all time
+#film_names = ['Avatar', 'Titanic', 'The Avengers', 'Furious 7', 'Avengers: Age of Ultron', 'Harry Potter and the Deathly Hallows: Part 2', 'Jurassic World', 'Frozen', 'Iron Man 3', 'Transformers: Dark of the Moon']
 
+def read_ratings(filename, header=27):
+    results = []
+    for i, line in enumerate(open(filename)):
+        if i > header:        
+            result = line.split('  ')[-1].strip()
+            results.append(result)
 
+    return results
 
-film_ratings = read_ratings(ratings_file)
-writer_lines = get_writer_lines(writers_file)
-director_lines = get_director_lines(directors_file)
-
-###################################################################################
-#DUMP INFO
-###################################################################################
-
-def save_film_names():
-    film_names = read_films(ratings_file)
-    cPickle.dump(film_names, open('film_list.pickle', 'w+'))
-    
-def load_film_list():    
-    return cPickle.load(open('film_list.pickle', 'r'))
-
-#film_list = load_film_list() if 'film_list' not in dir() else film_list ------------ test these 1 at a time
-
-def save_film_ratings():
-    film_ratings = read_ratings(ratings_file)
-    cPickle.dump(film_ratings, open('film_ratings_list.pickle', 'w+'))
-
-def load_ratings_list():    
-    return cPickle.load(open('film_ratings_list.pickle', 'r'))
-
-#ratings_list = load_ratings_list() if 'ratings_list' not in dir() else ratings_list
-
-def save_writer_films():
-    writer_lines = get_writer_lines(writers_file)
-    writer_films = pull_items(writer_lines)
-    cPickle.dump(writer_films, open('writer_films.pickle', 'w+'))
-    
-def load_writer_films():    
-    return cPickle.load(open('writer_films.pickle', 'r'))
-
-#writer_films = load_writer_films() if 'writer_films' not in dir() else writer_films
-
-def save_director_films():
-    director_lines = get_director_lines(directors_file)
-    director_films = pull_items(director_lines)
-    cPickle.dump(director_films, open('director_films.pickle', 'w+'))
-    
-def load_director_films():    
-    return cPickle.load(open('director_films.pickle', 'r'))
-
-#director_films = load_director_films() if 'director_films' not in dir() else director_films
+film_names = read_ratings('test.list')
 
 
-################################################################################
-## IF I WANT A FULL COPY OF FILM : INFO?!?!
-################################################################################
-#def make_film_dict(film_list):
-#    d = {}
-#    for film in film_list:
-#        info = get_film_info(film)
-#        if info[1] != [] and info[2] != []:
-#            print film, info
-#            d[film] = info
-#    return d
 
-#def save_film_dict():
-#    film_dict = make_film_dict(film_list)
-#    cPickle.dump(film_dict, open('film_dict.pickle', 'w+'))
-#    
-#def load_film_dict():    
-#    return cPickle.load(open('film_dict.pickle', 'r'))
+# list of film objects
+film_objects = []
+for x in film_names:
+    search_result = ia.search_movie(x)
+    project = search_result[0]
+    ia.update(project)
+    film_objects.append(project)
 
 
-#save_film_dict()
-#film_dict = load_film_dict if 'film_dict' not in dir() else film_dict
+# dict of film objects : director, HEAD writer, rating
+film_info = {}
+for x in film_objects:
+    director = x['director']
+    writers = x['writer']
+    head_writer = writers[0]
+    rating = x['rating']
+    info = (director, head_writer, rating)
+    film_info[x] = info
 
-#d = make_film_dict(film_names) ----------- test last
-#
-#for x in d:
-#    print x
-#    print d[x]
-#    print ''
+
+# list of all directors obejcts
+all_directors = []
+for x in film_objects:
+    all_directors.append(x['director'][0])
+# list of all directors names
+all_director_names = []
+for x in all_directors:
+    all_director_names.append(x['name'])
+
+
+# list of all HEAD writers
+all_writers = []
+for x in film_objects:
+    all_writers.append(x['writer'][0])
+# list of all HEAD writers names
+all_writer_names = []
+for x in all_writers:
+    all_writer_names.append(x['name'])
+
+
+# list of all ratings
+all_ratings = []
+for x in film_objects:
+    all_ratings.append(x['rating'])
+
+
+#make series of names
+film_series = pd.Series(film_names)
+print film_series
+director_series = pd.Series(all_director_names)
+writer_series = pd.Series(all_writer_names)
+rating_series = pd.Series(all_ratings)
+
+series_dict = {'film' : film_series, 'director' : director_series, 'writer' : writer_series, 'rating' : rating_series}
+
+
+df = pd.DataFrame(columns = ['film', 'director', 'writer', 'rating'], data = zip(film_series, director_series, writer_series, rating_series))
+
+print df
