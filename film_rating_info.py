@@ -32,7 +32,16 @@ def avg_rating(name, filmography_dict):
     avg = ratings[-1][1]
     return avg
 
-# REPLACCE WITH DICTS W/ RATINGS    
+# REPLACCE WITH DICTS W/ RATINGS 
+
+def test(name, opt='opt'):
+    allowed = ['actress', 'actor', 'director', 'writer']
+    d = '{0}_dict'.format(opt)
+    if opt in allowed:
+        print 'Searching for {0} in {1}...'.format(name, d)
+    else:
+        print 'Cannot look up {0} because there is no {1}!'.format(name, d)
+    return   
 
 def get_director_avg_rating(name):
     d_name = check_in_dict(name, director_films)

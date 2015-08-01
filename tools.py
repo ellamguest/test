@@ -6,6 +6,7 @@ Created on Tue Jul 14 13:20:59 2015
 """
 
 def check_in_dict(name, d):
+    name = name.title()
     return [n for n in d if name in n]
 
 def make_reverse_dict(d):
