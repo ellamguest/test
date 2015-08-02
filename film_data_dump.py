@@ -37,10 +37,7 @@ def load_writer_films():
     return cPickle.load(open('writer_films.pickle', 'r'))
 
 
-def save_director_films():
-    director_lines = get_director_lines(directors_file)
-    director_films = pull_items(director_lines)
-    cPickle.dump(director_films, open('director_films.pickle', 'w+'))
+
     
 def load_director_films():    
     return cPickle.load(open('director_films.pickle', 'r'))

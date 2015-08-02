@@ -35,6 +35,7 @@ def read_ratings(filename, header=281407, footer=633534):
     return results
     
 #previous footer=3582903
+
 def get_writer_lines(filename, header=301, footer=4101660):
     '''creates list of lines from writers_file'''
     results = []
